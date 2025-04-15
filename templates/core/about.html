@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+{% block extra_css %}
+{% load static %}
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #9cb399;
+    background-image: url('../../static/contour2.svg');
+    background-repeat: no-repeat;
+    background-size: 400%;
+    background-position: 65% 15%;
+}
+</style>{% endblock %}
+{% block title %}About This Website{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <p class="lead">This website was designed from the ground up to practice full stack web development tasks.</p>
+        <div class="mt-4">
+            <h3>Tech Stack</h3>
+            <ul>
+                <li>Web Frameworks
+                    <ul>
+                        <li>Front End
+                            <ul>
+                                <li>html (Django Template Language)</li>
+                                <li>css</li>
+                                <li>Bootstrap for buttons and layout</li>
+                                <li>d3.js for map visualizations</li>
+                            </ul>
+                        </li>
+                        <li>Back End
+                            <ul> 
+                                <li>Python</li>
+                                <li>Django</li>
+                                <li>sqlite</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>Server
+                    <ul>
+                        <li>Hosted on a Digital Ocean VPS</li>
+                        <li>Gunicorn WSGI Server</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

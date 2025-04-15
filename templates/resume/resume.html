@@ -1,0 +1,477 @@
+<!-- templates/resume/resume.html -->
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}My Resume{% endblock %}
+
+{% block extra_css %}
+<style>
+    
+    .job-section {
+        min-height: 100vh;
+        padding: 2rem 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .map-container {
+        position: sticky;
+        top: 2rem;
+        height: 95vh;
+        width: 100%;
+        background-color: #9cb399;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .map-background {
+        fill: #9cb399;
+    }
+    
+    .state {
+        fill: #9cb399;
+        stroke: #000000;
+        stroke-width: 0.5;
+        transition: fill 0.3s;
+    }
+    
+    .state:hover {
+        fill: #7d9179;
+    }
+    
+    .job-point {
+        fill: #2b2f2b;
+        stroke: #000000;
+        stroke-width: 0.25;
+        cursor: pointer;
+        transition: r 0.3s, fill 0.3s;
+    }
+    
+    .job-point.active {
+        fill: #b57131;
+        r: 1;
+    }
+    
+    .job-card {
+        border-left: 5px solid #b57131;
+        transition: transform 0.3s;
+    }
+    
+    .job-card.active {
+        transform: translateX(10px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .job-media-container {
+        display: flex;
+        overflow-x: auto;
+        gap: 1rem;
+        padding: 1rem 0;
+    }
+    
+    .job-media-item {
+        flex: 0 0 auto;
+        width: 200px;
+    }
+    
+    /* Styles for job regions */
+    .job-region {
+        fill: #40b531;
+        fill-opacity: 0.3;
+        stroke: #40503e;
+        stroke-width: 1;
+        pointer-events: all;
+        transition: fill-opacity 0.3s;
+    }
+    
+    .job-region:hover {
+        fill-opacity: 0.6;
+    }
+    
+    .tooltip {
+        position: absolute;
+        padding: 8px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        border-radius: 4px;
+        pointer-events: none;
+        font-size: 12px;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .controls {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.278);
+        padding: 5px 10px;
+        border-radius: 4px;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #9cb399;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 text-center">
+        <h1>Timothy Clark</h1>
+        <h4><a href=tel:+13852052834> (385) 205-2834</a> |
+            <a href=mailto:timothymclark0@gmail.com>timothymclark0@gmail.com</a> | Bloomington, IN</h4>    
+        <p class="lead">An experienced Data Scientist and researcher with a background in campaign management, Timothy Clark has worked in roles across the country.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-5">
+        <div class="map-container" id="map-container">
+            <!-- D3 map will be rendered here -->
+            <div id="tooltip" class="tooltip"></div>
+            <div class="controls">
+                <button id="reset-map" class="btn btn-sm btn-outline-secondary">Reset View</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-7">
+        <div id="job-timeline">
+            {% for job in jobs %}
+            <div class="job-section" id="job-{{ job.id }}" data-job-id="{{ job.id }}">
+                <div class="job-card card mb-4 p-3">
+                    <div class="card-body">
+                        <h3>{{ job.title }}</h3>
+                        <h5>{{ job.company }}</h5>
+                        <p class="text-muted">
+                            {{ job.start_date|date:"M Y" }} - 
+                            {% if job.is_current %}
+                                Present
+                            {% else %}
+                                {{ job.end_date|date:"M Y" }}
+                            {% endif %}
+                        </p>
+                        <p class="text-muted">{{ job.city }}, {{ job.state }}</p>
+                        
+                        <div class="mb-3">
+                            {{ job.description|linebreaks }}
+                        </div>
+                        
+                        {% if job.skills %}
+                        <div class="mb-3">
+                            <h6>Skills</h6>
+                            <p>{{ job.skills }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if job.achievements %}
+                        <div class="mb-3">
+                            <h6>Achievements</h6>
+                            <p>{{ job.achievements }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if job.media.all %}
+                        <div class="mt-4">
+                            <h6>Media</h6>
+                            <div class="job-media-container">
+                                {% for media in job.media.all %}
+                                <div class="job-media-item">
+                                    <img src="{{ media.image.url }}" alt="{{ media.title }}" class="img-fluid rounded">
+                                    <p class="small mt-1">{{ media.title }}</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Map dimensions
+        const width = document.getElementById('map-container').clientWidth;
+        const height = document.getElementById('map-container').clientHeight;
+        
+        // Create SVG container
+        const svg = d3.select('#map-container')
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height);
+            
+        // Add background
+        svg.append('rect')
+            .attr('width', width)
+            .attr('height', height)
+            .attr('class', 'map-background');
+            
+        // Create a projection for US map
+        const projection = d3.geoAlbersUsa()
+            .scale(width)
+            .translate([width / 2, height / 2]);
+            
+        // Create path generator
+        const path = d3.geoPath().projection(projection);
+        
+        // Set up tooltip
+        const tooltip = d3.select('#tooltip');
+        
+        // Create group for states
+        const statesGroup = svg.append('g').attr('class', 'states-group');
+        
+        // Create group for job regions
+        const regionsGroup = svg.append('g').attr('class', 'regions-group');
+        
+        // Create group for job points
+        const pointsGroup = svg.append('g').attr('class', 'points-group');
+        
+        // Load US states data and job data
+        Promise.all([
+            d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json'),
+            d3.json('{% url "georesume:job_data" %}')
+        ]).then(([us, jobData]) => {
+            // Simplify state boundaries for better performance
+            const simplificationFactor = 0.05; // Adjust for more/less simplification
+            const states = topojson.feature(us, us.objects.states);
+            
+            // Draw simplified states
+            statesGroup.selectAll('.state')
+                .data(states.features)
+                .enter()
+                .append('path')
+                .attr('class', 'state')
+                .attr('d', path);
+                
+            // Format job data for use with D3
+            jobData.forEach(job => {
+                job.coordinates = [job.longitude, job.latitude];
+            });
+            
+            // Draw job points
+            const jobPoints = pointsGroup.selectAll('.job-point')
+                .data(jobData)
+                .enter()
+                .append('circle')
+                .attr('class', 'job-point')
+                .attr('id', d => `point-${d.id}`)
+                .attr('cx', d => projection(d.coordinates)[0])
+                .attr('cy', d => projection(d.coordinates)[1])
+                .attr('r', 0.5);
+  
+            // Set up zoom functionality
+            const zoom = d3.zoom()
+                .scaleExtent([0.3, 90])
+                .on('zoom', function(event) {
+                    // Apply transform to all groups
+                    statesGroup.attr('transform', event.transform);
+                    regionsGroup.attr('transform', event.transform);
+                    pointsGroup.attr('transform', event.transform);
+                    
+                    // Adjust stroke-width based on zoom level
+                    const newStrokeWidth = 0.5 / event.transform.k;
+                    statesGroup.selectAll('.state').style('stroke-width', newStrokeWidth);
+                    regionsGroup.selectAll('.job-region').style('stroke-width', newStrokeWidth);
+                });
+                
+            // Apply zoom to SVG
+            svg.call(zoom);
+            
+            // Default zoom level for jobs without regions
+            const DEFAULT_ZOOM_LEVEL = 15;
+            
+            // Function to load and display job region data
+            function loadAndDisplayJobRegion(jobId) {
+                // Get API URL for job GeoJSON data
+                const url = `{% url "georesume:job_geojson" %}?job_id=${jobId}`;
+                
+                // Load the job region data
+                d3.json(url).then(geoData => {
+                    if (!geoData || !geoData.objects) {
+                        console.log(`No GeoJSON data available for job ${jobId}`);
+                        // If no region data, use default zoom
+                        const job = jobData.find(j => j.id.toString() === jobId);
+                        if (job) {
+                            zoomToJobLocation(job.coordinates, DEFAULT_ZOOM_LEVEL);
+                        }
+                        return;
+                    }
+                    // Get the first object in the GeoJSON data
+                    const objectName = Object.keys(geoData.objects)[0];
+                    if (!objectName) {
+                        console.log(`No objects found in GeoJSON for job ${jobId}`);
+                        const job = jobData.find(j => j.id.toString() === jobId);
+                        if (job) {
+                            zoomToJobLocation(job.coordinates, DEFAULT_ZOOM_LEVEL);
+                        }
+                        return;
+}
+                    // Convert TopoJSON to GeoJSON for display
+                    const features = topojson.feature(geoData, geoData.objects[objectName]);
+                    
+                    // Calculate appropriate zoom level based on region bounds
+                    const bounds = path.bounds(features);
+                    const dx = bounds[1][0] - bounds[0][0];
+                    const dy = bounds[1][1] - bounds[0][1];
+                    const x = (bounds[0][0] + bounds[1][0]) / 2;
+                    const y = (bounds[0][1] + bounds[1][1]) / 2;
+                    
+                    // Calculate zoom scale based on region size
+                    // Smaller scale value for larger regions to fit them in view
+                    const scale = Math.min(0.9 * Math.min(width / dx, height / dy), 20);
+                    
+                    // Add the features to the map with transitions
+                    regionsGroup.selectAll('.job-region')
+                        .data(features.features, d => d.id || Math.random())
+                        .join(
+                            // Handle new elements with enter transition
+                            enter => enter
+                                .append('path')
+                                .attr('class', 'job-region')
+                                .attr('id', (d, i) => `region-${jobId}-${i}`)
+                                .attr('d', path)
+                                .style('opacity', 0)
+                                .transition()
+                                .duration(750)
+                                .style('opacity', 0.8),
+                            
+                            // Update existing elements
+                            update => update,
+                            
+                            // Remove elements with exit transition
+                            exit => exit
+                                .transition()
+                                .duration(750)
+                                .style('opacity', 0)
+                                .remove()
+                        );
+                    
+                    // Zoom to the region bounds
+                    const job = jobData.find(j => j.id.toString() === jobId);
+                    if (job) {
+                        // Use more appropriate zoom level based on region size
+                        zoomToJobLocation(job.coordinates, scale);
+                    }
+                    
+                }).catch(error => {
+                    console.error(`Error loading GeoJSON for job ${jobId}:`, error);
+                    
+                    // If error loading region, use default zoom
+                    const job = jobData.find(j => j.id.toString() === jobId);
+                    if (job) {
+                        zoomToJobLocation(job.coordinates, DEFAULT_ZOOM_LEVEL);
+                    }
+                });
+            }
+            
+            // Intersection Observer for job sections
+            const jobSections = document.querySelectorAll('.job-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const jobId = entry.target.dataset.jobId;
+                    const jobCard = entry.target.querySelector('.job-card');
+                    const jobPoint = document.getElementById(`point-${jobId}`);
+                    
+                    if (entry.isIntersecting) {
+                        // Highlight active job card and map point
+                        jobCard.classList.add('active');
+                        if (jobPoint) {
+                            jobPoint.classList.add('active');
+                            
+                            // Move active point to front by reappending it to its parent
+                            const pointParent = jobPoint.parentNode;
+                            pointParent.appendChild(jobPoint);
+                        }
+                        
+                        // Find active job data
+                        const job = jobData.find(j => j.id.toString() === jobId);
+                        if (job) {
+                            // Load and display job region (which will handle zooming)
+                            loadAndDisplayJobRegion(jobId);
+                        }
+                    } else {
+                        // Remove highlight from job card and point
+                        jobCard.classList.remove('active');
+                        if (jobPoint) jobPoint.classList.remove('active');
+                        
+                        // Remove job regions when scrolling away
+                        regionsGroup.selectAll(`.job-region[id^="region-${jobId}-"]`)
+                            .transition()
+                            .duration(750)
+                            .style('opacity', 0)
+                            .remove();
+                    }
+                });
+            }, {
+                threshold: 0.6
+            });
+            
+            // Observe all job sections
+            jobSections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            // Function to zoom to a job location with dynamic scale
+            function zoomToJobLocation(coordinates, scale) {
+                const [x, y] = projection(coordinates);
+                if (!x || !y) return;
+                
+                // Use provided scale or default
+                const zoomScale = scale || DEFAULT_ZOOM_LEVEL;
+                
+                // Create transition
+                svg.transition()
+                    .duration(1000)
+                    .call(
+                        zoom.transform,
+                        d3.zoomIdentity
+                            .translate(width / 2, height / 2)
+                            .scale(zoomScale)
+                            .translate(-x, -y)
+                    );
+            }
+            
+            // Reset map button
+            document.getElementById('reset-map').addEventListener('click', function() {
+                // Clear job regions
+                regionsGroup.selectAll('.job-region')
+                    .transition()
+                    .duration(750)
+                    .style('opacity', 0)
+                    .remove();
+                
+                // Reset zoom to show full US map
+                svg.transition()
+                    .duration(1000)
+                    .call(
+                        zoom.transform,
+                        d3.zoomIdentity
+                    );
+            });
+            
+            // Add click handlers to job points
+            jobPoints.on('click', function(event, d) {
+                // Find the corresponding job section
+                const jobSection = document.getElementById(`job-${d.id}`);
+                if (jobSection) {
+                    // Scroll to the job section
+                    jobSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
