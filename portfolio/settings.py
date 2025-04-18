@@ -29,13 +29,13 @@ DEBUG = False
 def ip_addresses():
     ip_list = []
     for interface in netifaces.interfaces():
-        addrs = netifaces.ifaddress(interface)
+        addrs = netifaces.ifaddresses(interface)
         for x in (netifaces.AF_INET, netifaces.AF_INET6):
             if x in addrs:
                 ip_list.append(addrs[x][0]['addr'])
     return ip_list
 
-ALLOWED_HOSTS = ip_addresses()
+ALLOWED_HOSTS = ip_addresses() + ['localhost']
 
 
 # Application definition
@@ -133,3 +133,22 @@ STATIC_URL = '../static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+   'version': 1,
+   'disable_existing_loggers': False,
+   'handlers': {
+      'file': {
+         'level': 'DEBUG',
+         'class': 'logging.FileHandler',
+         'filename': '/tmp/debug.log',
+      },
+   },
+   'loggers': {
+      'django': {
+         'handlers': ['file'],
+         'level': 'DEBUG',
+         'propagate': True,
+      },
+   },
+}
