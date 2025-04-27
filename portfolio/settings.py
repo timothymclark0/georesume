@@ -35,9 +35,9 @@ def ip_addresses():
                 ip_list.append(addrs[x][0]['addr'])
     return ip_list
 
-ALLOWED_HOSTS = ip_addresses() + ['localhost']
+ALLOWED_HOSTS = ip_addresses() + ['localhost','timc.space']
 
-
+USE_X_FORWARDED_HOST = True
 # Application definition
 
 INSTALLED_APPS = [
