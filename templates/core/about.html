@@ -12,42 +12,58 @@ body {
     background-size: 400%;
     background-position: 65% 15%;
 }
+.container-big {
+    vertical-align: middle;
+    height:100vh - 65px;
+    width:100vw;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.row {
+    background-color: #e9ecef9f;
+    border-radius: 8px;
+    height:70vh;
+    width: 75vw;
+}
 </style>{% endblock %}
 {% block title %}About This Website{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8 offset-md-2">
-        <p class="lead">This website was designed from the ground up to practice full stack web development tasks.</p>
-        <div class="mt-4">
-            <h3>Tech Stack</h3>
-            <ul>
-                <li>Web Frameworks
-                    <ul>
-                        <li>Front End
-                            <ul>
-                                <li>html (Django Template Language)</li>
-                                <li>css</li>
-                                <li>Bootstrap for buttons and layout</li>
-                                <li>d3.js for map visualizations</li>
-                            </ul>
-                        </li>
-                        <li>Back End
-                            <ul> 
-                                <li>Python</li>
-                                <li>Django</li>
-                                <li>sqlite</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-                <li>Server
-                    <ul>
-                        <li>Hosted on a Digital Ocean VPS</li>
-                        <li>Gunicorn WSGI Server</li>
-                    </ul>
-                </li>
-            </ul>
+<div class="container-big"> 
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <p class="lead">This website was designed from the ground up to practice full stack web development tasks.</p>
+            <div class="mt-4">
+                <h3>Tech Stack</h3>
+                <ul>
+                    <li>Web Frameworks
+                        <ul>
+                            <li>Front End
+                                <ul>
+                                    <li>html (Django Template Language)</li>
+                                    <li>css</li>
+                                    <li>Bootstrap for buttons and layout</li>
+                                    <li>d3.js for map visualizations</li>
+                                </ul>
+                            </li>
+                            <li>Back End
+                                <ul> 
+                                    <li>Python</li>
+                                    <li>Django</li>
+                                    <li>sqlite</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>Server
+                        <ul>
+                            <li>Hosted on a Digital Ocean VPS</li>
+                            <li>Gunicorn WSGI Server</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

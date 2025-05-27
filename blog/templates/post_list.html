@@ -1,0 +1,98 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Blog Posts{% endblock %}
+
+{% block extra_css %} 
+<style>
+    .no-img {
+        background-color:rgb(81, 81, 81)
+    }
+    .big-container {
+        display: flex;
+        background-color: #e9ecef9f;
+        border-radius: 8px;
+        max-width: 800px;
+        margin: 2rem auto;
+        height:74vh;
+        vertical-align: middle;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+        justify-content: center;
+        margin: 2rem;
+        flex-direction: column;
+    }
+    .small-container {
+        display: flex;
+        border-radius: 4px;
+        height:4rem;
+        width: fit-content;
+        justify-content: center;
+        vertical-align: middle;
+        margin: 1rem;
+    
+    }
+    .child {
+        flex: auto;
+        gap: 1rem;
+    }
+    .post {
+        margin: 0.25rem;
+        background-color: #e9ecef;
+        border-radius: 3px;
+    }
+    .tag-badge, .skill-badge {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+        border-radius: 4px;
+        display: inline-block;
+      }
+      
+      .tag-badge {
+        background-color: #dff0d8;
+      }
+      
+      .skill-badge {
+        background-color: #dff0d8;
+      }
+</style>
+{% endblock %}
+
+{% block content %}
+<center>
+    <div class="big-container">
+        <h1>Posts</h1>
+        <hr>
+        <ul class="list-group list-group-flush">
+            {% for post in posts %}
+                <a class='list-group-item' style='background-color: rgba(0,0,0,0)' href="{% url 'blog:view_post' post.date_posted.year post.date_posted.month post.date_posted.day post.slug %}">
+                    <div class="d-flex flex-row align-items-center post" style='min-height: 100px'>
+                        {% if post.featured_image %}
+                            <div class="flex-shrink-0" style="width: 25%;">
+                                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="img-fluid">
+                            </div>
+                        {% else %}
+                            <div class="flex-shrink-0" style="width: 25%; height: 80px;">
+                                <!-- Placeholder for no image -->
+                            </div>
+                        {% endif %}
+                        <div class="flex-grow-1 px-3">
+                            <h5>{{ post.title }}{% if post.featured_post %} <span class="badge badge-secondary">Featured</span>{% endif %}</h5>
+                            <p class="font-weight-normal text-left"><i>{{ post.subtitle }}</i></p>
+                            <p class="text-muted">{{ post.date_posted|date:"M d, Y" }}</p>
+                        </div>
+                        <div class="flex-shrink-0">
+                                <div class="d-flex flex-column">
+                                    {% for tag in post.tags.all %}
+                                    <span class="tag-badge">{{ tag.tag }}</span>
+                                    {% endfor %}
+                                </div>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </ul>
+    </div>
+</center>
+{% endblock %}

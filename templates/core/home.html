@@ -1,18 +1,56 @@
 {% extends 'core/base.html' %}
 
+{% block extra_css %}
+<style>
+.big-container {
+    display: flex;
+    background-color: #e9ecef9f;
+    border-radius: 8px;
+    height:70vh;
+    vertical-align: middle;
+    width: 75vw;
+    justify-content: center;
+    margin: 2rem;
+    flex-direction: column;
+}
+.small-container {
+    display: flex;
+    border-radius: 4px;
+    height:fit-content;
+    justify-content: center;
+    vertical-align: middle;
+    margin: 1rem;
+
+}
+.child {
+    flex: auto;
+    gap: 1rem;
+}
+</style>
+{% endblock %}
 {% block title %}My Portfolio - Home{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8 offset-md-2 text-center">
-        <h1 class="display-4 mb-4">Welcome to my space</h1>
-        <p class="lead">
-            I'm a data scientist with a focus on geography. This is a space to collect projects, portfolios, and host my resume. 
-            This website is a practice project branching out into web development. To find out about how the site was built, <a href="{% url 'core:about' %}">click here.</a>
-        </p>
-        <div class="mt-4">
-            <a href="{% url 'georesume:resume' %}" class="btn btn-outline-dark btn-lg">View My Resume</a>
+<center>
+    <div class="big-container">
+        <div class="small-container">
+            <h1 class="child">Welcome to my space</h1>
+        </div>
+        <div class="small-container">
+            <p class="lead">
+                I'm a data scientist with a focus on geography. This is a space to collect projects, portfolios, and host my resume. 
+                This website is a practice project branching out into web development. To find out about how the site was built, <a href="{% url 'core:about' %}">click here.</a>
+            </p>
+        </div>
+            <div class="small-container">
+                <span class="child">
+                    <a href="{% url 'georesume:resume' %}" class="btn btn-outline-dark btn-lg">Resume</a>
+                </span>
+                <span class="child">
+                    <a href="{% url 'portfoliogallery:project_list' %}" class="btn btn-outline-dark btn-lg">Portfolio</a>
+                </span>
+            </div>
         </div>
     </div>
-</div>
+</center>
 {% endblock %}
