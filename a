@@ -1,0 +1,5 @@
+[0;1;31m×[0m gunicorn.socket - gunicorn socket
+     Loaded: loaded (/etc/systemd/system/gunicorn.socket; enabled; vendor preset: enabled)
+     Active: [0;1;31mfailed[0m (Result: service-start-limit-hit) since Tue 2025-04-15 23:16:52 UTC; 1min 47s ago
+   Triggers: [0;1;31m●[0m gunicorn.service
+     Listen: /run/gunicorn.sock (Stream)
