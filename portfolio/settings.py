@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-v7msaqxo=1(x#ad5h!i@1f3jdn%c5tswxy)62355#gjc(tm44q'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 def ip_addresses():
     ip_list = []
@@ -132,9 +132,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-#STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = BASE_DIR / 'static'
 
-STATICFILES_DIRS = [BASE_DIR / 'static',]
+STATICFILES_DIRS = [ BASE_DIR / 'posts',]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

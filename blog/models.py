@@ -17,7 +17,7 @@ class Post(models.Model):
     slug = models.SlugField(blank=True)
     date_posted = models.DateTimeField(default = now)
     tags = models.ManyToManyField(Tag, related_name='post_tag', blank=True)
-    featured_image = models.ImageField(upload_to='posts/featured/', blank=True,null=True)
+    featured_image = models.ImageField(upload_to='static/blog/posts/featured/', blank=True,null=True)
     featured_post = models.BooleanField(default = False)
     
     def save(self, *args, **kwargs):
