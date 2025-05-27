@@ -4,7 +4,7 @@ from .models import Project, Category
 
 class ProjectListView(ListView):
     model = Project
-    template_name = 'portfolio/project_list.html'
+    template_name = 'portfoliogallery/project_list.html'
     context_object_name = 'projects'
     
     def get_context_data(self, **kwargs):
@@ -15,7 +15,7 @@ class ProjectListView(ListView):
 
 class ProjectDetailView(DetailView):
     model = Project
-    template_name = 'portfolio/project_detail.html'
+    template_name = 'portfoliogallery/project_detail.html'
     context_object_name = 'project'
     
     def get_context_data(self, **kwargs):
@@ -34,7 +34,7 @@ class ProjectDetailView(DetailView):
         return context
 
 class CategoryProjectsView(ListView):
-    template_name = 'portfolio/category_projects.html'
+    template_name = 'portfoliogallery/category_projects.html'
     context_object_name = 'projects'
     
     def get_queryset(self):

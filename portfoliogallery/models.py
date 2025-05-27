@@ -57,7 +57,7 @@ class Project(models.Model):
         super().save(*args, **kwargs)
     
     def get_absolute_url(self):
-        return reverse('portfolio:project_detail', kwargs={'slug': self.slug})
+        return reverse('portfoliogallery:project_detail', kwargs={'slug': self.slug})
     
     def __str__(self):
         return self.title

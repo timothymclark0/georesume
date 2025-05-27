@@ -1,0 +1,182 @@
+{% extends 'core/base.html' %}
+{% load markdown_extras %}
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block extra_css %} 
+<style>
+.blog-container {
+    background-color: rgba(233, 236, 239, 0.95);
+    border-radius: 8px;
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.featured-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 12px 12px 0 0;
+}
+
+.blog-content {
+    padding: 3rem 2.5rem;
+}
+
+.blog-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #2c3e50;
+    line-height: 1.2;
+}
+
+.blog-subtitle {
+    font-style: italic;
+    font-size: 1.2rem;
+    text-align: left;
+    margin-bottom: 2rem;
+    color: #6c757d;
+    line-height: 1.4;
+}
+
+.blog-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #dee2e6;
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+
+.author-info {
+    font-weight: 500;
+}
+
+.publish-date {
+    font-weight: 400;
+}
+
+.blog-body {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #343a40;
+}
+
+.blog-body p {
+    margin-bottom: 1.5rem;
+}
+
+.blog-body h1, .blog-body h2, .blog-body h3, 
+.blog-body h4, .blog-body h5, .blog-body h6 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.blog-body blockquote {
+    border-left: 4px solid #007bff;
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: #6c757d;
+}
+
+.blog-body code {
+    background-color: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+.blog-body pre {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 1.5rem 0;
+}
+
+@media (max-width: 768px) {
+    .blog-container {
+        margin: 1rem;
+        max-width: none;
+    }
+    
+    .blog-content {
+        padding: 2rem 1.5rem;
+    }
+    
+    .blog-title {
+        font-size: 2rem;
+    }
+    
+    .blog-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .featured-image {
+        height: 250px;
+    }
+}
+.tag-badge, .skill-badge {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  
+  .tag-badge {
+    background-color: #dff0d8;
+  }
+  
+  .skill-badge {
+    background-color: #dff0d8;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="blog-container">
+    {% if post.featured_image %}
+        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="featured-image">
+    {% endif %}
+    
+    <div class="blog-content">
+        <h1 class="blog-title">{{ post.title }}</h1>
+        
+        {% if post.subtitle %}
+            <p class="blog-subtitle">{{ post.subtitle }}</p>
+        {% endif %}
+        
+        <div class="blog-meta">
+            <div class="author-info">
+                By tim c
+            </div>
+            <div class="publish-date">
+                {{ post.date_posted|date:"F j, Y" }}
+            </div>
+        </div>
+        
+        <div class="blog-body">
+            {{ post.body|markdown|safe }}
+        </div>
+        <div class="d-flex flex-row">
+            {% for tag in post.tags.all %}
+            <span class="tag-badge">{{ tag.tag }}</span>
+            {% endfor %}
+        </div>
+        <hr>
+        <a class="btn btn-outline-dark" href="{% url 'blog:post_list' %}"><- Back</a>    
+    </div>
+</div>
+{% endblock %}
