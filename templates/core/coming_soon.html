@@ -1,0 +1,24 @@
+{% extends 'core/base.html' %}
+{% block extra_css %}
+{% load static %}
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #9cb399;
+    background-image: url('../../static/contour2.svg');
+    background-repeat: no-repeat;
+    background-size: 400%;
+    background-position: 65% 15%;
+}
+</style>{% endblock %}
+{% block title %}Coming Soon{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h1>Coming Soon!</h1>
+    </div>
+</div>
+{% endblock %}
