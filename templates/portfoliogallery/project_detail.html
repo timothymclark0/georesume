@@ -1,0 +1,637 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}{{ project.title }} - My Portfolio{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" />
+
+<style>
+  
+
+  /* General layout styles */
+  .primary-content {
+    cursor: zoom-in; /* Add cursor indicator for images */
+  }
+
+  .project-container {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    height:fit-content;
+  }
+  
+  /* Content display area */
+  .project-content {
+    flex: 3; /* Takes 3/4 of the width on desktop */
+  }
+  
+  /* Sidebar styles */
+  .project-sidebar {
+    flex: 1; /* Takes 1/4 of the width on desktop */
+    background-color: #e9ecef;
+    border-radius: 4px;
+    padding: 1.5rem;
+    height: fit-content;
+    position: sticky;
+    top: 2rem;
+    overflow-y: auto;
+    height: 75vh;
+  }
+  
+  /* Media gallery styles */
+  .media-gallery {
+    margin-bottom: 2rem;
+  }
+  
+  .gallery-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  
+  .gallery-thumbs {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .gallery-thumb {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+  
+  .gallery-thumb.active {
+    opacity: 1;
+    border: 2px solid #0d6efd;
+  }
+  
+  /* Primary content display */
+  .primary-content {
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: #e9ecef;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .primary-content img {
+    max-width: 100%;
+    max-height: 75vh;
+    object-fit: contain;
+  }
+  
+  /* GitHub repository card */
+  .github-card {
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    padding: 1rem;
+    background-color: white;
+  }
+  
+  .github-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .github-icon {
+    width: 24px;
+    margin-right: 0.5rem;
+  }
+  
+  /* Website preview */
+  .website-preview {
+    border: 1px solid #dee2e6;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+  }
+  
+  .browser-header {
+    background-color: #f1f3f5;
+    padding: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+  }
+  
+  .browser-actions {
+    display: flex;
+    gap: 0.25rem;
+    margin-right: 1rem;
+  }
+  
+  .browser-circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #dee2e6;
+  }
+  
+  .browser-address {
+    background-color: white;
+    border-radius: 12px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .browser-content {
+    height: 400px;
+    overflow: hidden;
+  }
+  
+  .browser-content img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* PDF embed */
+  .pdf-embed {
+    width: 100%;
+    height: 600px;
+    border: none;
+  }
+  
+  /* Video embed */
+  .video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+  }
+  
+  .video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  
+  /* Project details */
+  .project-metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .metadata-item {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    min-width: 100px;
+  }
+  
+  .metadata-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+  }
+  
+  .metadata-value {
+    font-weight: 500;
+  }
+  
+  .category-badge, .skill-badge {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  
+  .category-badge {
+    background-color: #e9ecef;
+  }
+  
+  .skill-badge {
+    background-color: #dff0d8;
+  }
+  
+  .project-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    border-top: 1px solid #dee2e6;
+    padding-top: 1rem;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 991.98px) {
+    .project-container {
+      flex-direction: column;
+    }
+    
+    .project-content, .project-sidebar {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+    
+    .project-sidebar {
+      position: relative;
+      top: 0;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{% url 'portfoliogallery:project_list' %}" class="btn btn-outline-dark btn-small"><- Return to projects</a>
+<div class="container py-5">  
+  <div class="project-container">
+    <!-- Left side content area (approx 3/4 width on desktop) -->
+    <div class="project-content">
+      <!-- Media gallery -->
+      <div class="media-gallery">
+        <!-- Primary content display -->
+        <div class="primary-content" id="primaryContent">
+          {% if project.primary_artifact_type == 'image' %}
+            {% if project.images.first %}
+              <img src="{{ project.images.first.image.url }}" 
+                  alt="{{ project.images.first.caption }}" 
+                  class="main-image" 
+                  id="mainImage" 
+                  data-index="0" />
+            {% else %}
+              <img src="{{ project.featured_image.url }}" 
+                  alt="{{ project.title }}" 
+                  class="main-image" 
+                  data-index="0" />
+            {% endif %}
+            {% for img in project.images.all %}
+              <img src="{{ img.image.url }}" 
+                  alt="{{ img.caption }}" 
+                  class="gallery-thumb {% if forloop.first %}active{% endif %}" 
+                  data-type="image" 
+                  data-src="{{ img.image.url }}" 
+                  data-caption="{{ img.caption }}" 
+                  data-index="{{ forloop.counter0 }}" 
+                  onclick="changeMedia(this)" />
+            {% endfor %}
+          {% elif project.primary_artifact_type == 'pdf' %}
+            {% if project.pdfs.first %}
+              <iframe src="{{ project.pdfs.first.file.url }}" class="pdf-embed"></iframe>
+            {% else %}
+              <div class="text-center p-5">
+                <p>No PDF available</p>
+              </div>
+            {% endif %}
+          {% elif project.primary_artifact_type == 'github' %}
+            {% if project.github_url %}
+              <div class="github-card">
+                <div class="github-header">
+                  <svg class="github-icon" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path>
+                  </svg>
+                  <h5 class="m-0">GitHub Repository</h5>
+                </div>
+                <p class="mb-3">Browse and explore the complete source code for this project:</p>
+                <div class="d-grid">
+                  <a href="{{ project.github_url }}" class="btn btn-dark" target="_blank">
+                    <i class="fab fa-github me-2"></i>View Repository
+                  </a>
+                </div>
+                <div class="mt-3 text-center">
+                  <small class="text-muted">Repository preview not available. Click the button above to visit GitHub.</small>
+                </div>
+              </div>
+            {% else %}
+              <div class="text-center p-5">
+                <p>GitHub repository link not available</p>
+              </div>
+            {% endif %}
+          {% elif project.primary_artifact_type == 'website' %}
+            {% if project.website_url %}
+              <div class="website-preview">
+                <div class="browser-header">
+                  <div class="browser-actions">
+                    <div class="browser-circle"></div>
+                    <div class="browser-circle"></div>
+                    <div class="browser-circle"></div>
+                  </div>
+                  <div class="browser-address">{{ project.website_url }}</div>
+                </div>
+                <div class="browser-content">
+                  <img src="{{ project.featured_image.url }}" alt="Website Preview" />
+                </div>
+                <div class="p-3 text-center">
+                  <a href="{{ project.website_url }}" class="btn btn-primary" target="_blank">
+                    <i class="fas fa-external-link-alt me-2"></i>Visit Website
+                  </a>
+                </div>
+              </div>
+            {% else %}
+              <div class="text-center p-5">
+                <p>Website link not available</p>
+              </div>
+            {% endif %}
+          {% else %}
+            <img src="{{ project.featured_image.url }}" alt="{{ project.title }}" class="main-image" />
+          {% endif %}
+        </div>
+        
+        <!-- Navigation and thumbnails for gallery types -->
+        {% if project.images.count > 1 or project.videos.count > 1 or project.pdfs.count > 1 %}
+          <div class="gallery-thumbs" id="galleryThumbs">
+            {% if project.primary_artifact_type == 'image' %}
+              {% for img in project.images.all %}
+                <img src="{{ img.image.url }}" alt="{{ img.caption }}" class="gallery-thumb {% if forloop.first %}active{% endif %}" data-type="image" data-src="{{ img.image.url }}" data-caption="{{ img.caption }}" onclick="changeMedia(this)" />
+              {% endfor %}
+            {% elif project.primary_artifact_type == 'video' %}
+              {% for video in project.videos.all %}
+                <div class="gallery-thumb {% if forloop.first %}active{% endif %}" data-type="video" data-src="{{ video.url }}" data-title="{{ video.title }}" onclick="changeMedia(this)">
+                  <div class="d-flex align-items-center justify-content-center h-100">
+                    <i class="fas fa-video"></i>
+                  </div>
+                </div>
+              {% endfor %}
+            {% elif project.primary_artifact_type == 'pdf' %}
+              {% for pdf in project.pdfs.all %}
+                <div class="gallery-thumb {% if forloop.first %}active{% endif %}" data-type="pdf" data-src="{{ pdf.file.url }}" data-title="{{ pdf.title }}" onclick="changeMedia(this)">
+                  <div class="d-flex align-items-center justify-content-center h-100">
+                    <i class="fas fa-file-pdf"></i>
+                  </div>
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Right side sidebar (approx 1/4 width on desktop) -->
+    <div class="project-sidebar">
+      <h3 class="display-5 mb-3">{{ project.title }}</h3>
+      <div class="mb-4">
+        <h6 class="text-muted mb-2">DESCRIPTION</h6>
+        <div class="description-text">
+          {% autoescape off %}
+          {{ project.description|linebreaks }}
+          {% endautoescape %}
+        </div>
+      </div>
+      
+      <div class="mt-4">
+        {% if project.github_url %}
+        <a href="{{ project.github_url }}" class="btn btn-sm btn-outline-dark mb-2 w-100" target="_blank">
+          <i class="fab fa-github me-2"></i>GitHub Repository
+        </a>
+        {% endif %}
+        
+        {% if project.website_url %}
+        <a href="{{ project.website_url }}" class="btn btn-sm btn-outline-primary w-100" target="_blank">
+          <i class="fas fa-external-link-alt me-2"></i>Visit Website
+        </a>
+        {% endif %}
+      </div>
+      <div class="project-metadata">
+        <div class="metadata-item">
+          <span class="metadata-label">CREATED</span>
+          <span class="metadata-value">{{ project.date_created|date:"M Y" }}</span>
+        </div>
+        {% if project.date_completed %}
+        <div class="metadata-item">
+          <span class="metadata-label">COMPLETED</span>
+          <span class="metadata-value">{{ project.date_completed|date:"M Y" }}</span>
+        </div>
+        {% endif %}
+      </div>
+      
+      <div class="mb-4">
+        <h6 class="text-muted mb-2">CATEGORIES</h6>
+        {% for category in project.categories.all %}
+        <span class="category-badge">{{ category.name }}</span>
+        {% endfor %}
+      </div>
+      
+      <div class="mb-4">
+        <h6 class="text-muted mb-2">SKILLS</h6>
+        {% for skill in project.skills.all %}
+        <span class="skill-badge">{{ skill.name }}</span>
+        {% endfor %}
+      </div>
+    </div> 
+  </div>
+  
+  <!-- Project navigation -->
+  <div class="project-nav mt-5">
+    {% if previous_project %}
+    <a href="{{ previous_project.get_absolute_url }}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-2"></i>{{ previous_project.title }}
+    </a>
+    {% else %}
+    <div></div>
+    {% endif %}
+    
+    {% if next_project %}
+    <a href="{{ next_project.get_absolute_url }}" class="btn btn-outline-secondary">
+      {{ next_project.title }}<i class="fas fa-arrow-right ms-2"></i>
+    </a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.4/umd/photoswipe.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.4/umd/photoswipe-lightbox.umd.min.js"></script>
+
+<script>
+  // Initialize lightbox for project images
+document.addEventListener('DOMContentLoaded', function() {
+  // Only initialize lightbox if we have images
+  if ('{{ project.primary_artifact_type }}' === 'image') {
+    // Create image items array for PhotoSwipe
+    const items = [];
+    
+    {% if project.images.count > 0 %}
+      {% for img in project.images.all %}
+        items.push({
+          src: '{{ img.image.url }}',
+          w: 0, // Will be determined when image loads
+          h: 0, // Will be determined when image loads
+          alt: '{{ img.caption }}',
+          title: '{{ img.caption }}'
+        });
+      {% endfor %}
+    {% else %}
+      // If no gallery images, use featured image
+      items.push({
+        src: '{{ project.featured_image.url }}',
+        w: 0,
+        h: 0,
+        alt: '{{ project.title }}',
+        title: '{{ project.title }}'
+      });
+    {% endif %}
+    
+    // Initialize PhotoSwipe
+    const lightbox = new PhotoSwipeLightbox({
+      gallery: '#primaryContent',
+      children: 'img.main-image',
+      pswpModule: PhotoSwipe,
+      showHideAnimationType: 'zoom',
+      bgOpacity: 0.9,
+      clickToCloseNonZoomable: false,
+      maxZoomLevel: 4,
+      imageClickAction: 'zoom',
+      tapAction: 'zoom',
+      
+      // Add caption from data attribute
+      addCaptionHTMLFn: (item, captionEl) => {
+        if(!item.title) {
+          return false;
+        }
+        
+        captionEl.children[0].innerHTML = item.title;
+        return true;
+      }
+    });
+    
+    // Open when clicking the primary image
+    document.querySelector('.primary-content').addEventListener('click', (e) => {
+      if (e.target.classList.contains('main-image')) {
+        e.preventDefault();
+        const index = parseInt(e.target.dataset.index || 0);
+        lightbox.loadAndOpen(index, { gallery: items });
+      }
+    });
+  }
+  
+  // Initialize gallery thumbnails
+  const galleryThumbs = document.getElementById('galleryThumbs');
+  if (galleryThumbs && galleryThumbs.children.length > 0) {
+    // Set first thumbnail as active by default
+    galleryThumbs.children[0].classList.add('active');
+  }
+  
+  // Add responsive behavior for sidebar on mobile
+  function checkMobile() {
+    const sidebar = document.querySelector('.project-sidebar');
+    if (window.innerWidth <= 991.98) {
+      sidebar.style.maxHeight = '400px';
+      sidebar.style.overflowY = 'auto';
+    } else {
+      sidebar.style.maxHeight = '';
+      sidebar.style.overflowY = '';
+    }
+  }
+  
+  window.addEventListener('resize', checkMobile);
+  checkMobile();
+});
+
+function changeMedia(element) {
+  // Remove active class from all thumbnails
+  document.querySelectorAll('.gallery-thumb').forEach(thumb => {
+    thumb.classList.remove('active');
+  });
+  
+  // Add active class to clicked thumbnail
+  element.classList.add('active');
+  
+  const primaryContent = document.getElementById('primaryContent');
+  const mediaType = element.dataset.type;
+  const mediaSrc = element.dataset.src;
+  const index = element.dataset.index || 0;
+  
+  // Clear current content
+  primaryContent.innerHTML = '';
+  
+  // Add new content based on type
+  if (mediaType === 'image') {
+    const img = document.createElement('img');
+    img.src = mediaSrc;
+    img.alt = element.dataset.caption || 'Project Image';
+    img.className = 'main-image';
+    img.dataset.index = index;
+    primaryContent.appendChild(img);
+  } else if (mediaType === 'video') {
+    const videoContainer = document.createElement('div');
+    videoContainer.className = 'video-container';
+    
+    const iframe = document.createElement('iframe');
+    // Handle YouTube and Vimeo URLs
+    if (mediaSrc.includes('youtube')) {
+      iframe.src = mediaSrc.replace('watch?v=', 'embed/');
+    } else if (mediaSrc.includes('vimeo')) {
+      iframe.src = mediaSrc.replace('vimeo.com/', 'player.vimeo.com/video/');
+    } else {
+      iframe.src = mediaSrc;
+    }
+    iframe.setAttribute('allowfullscreen', '');
+    
+    videoContainer.appendChild(iframe);
+    primaryContent.appendChild(videoContainer);
+  } else if (mediaType === 'pdf') {
+    const iframe = document.createElement('iframe');
+    iframe.src = mediaSrc;
+    iframe.className = 'pdf-embed';
+    primaryContent.appendChild(iframe);
+  }
+}
+</script>
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+  <!-- Background of PhotoSwipe -->
+  <div class="pswp__bg"></div>
+  
+  <!-- Slides wrapper with overflow:hidden -->
+  <div class="pswp__scroll-wrap">
+    <div class="pswp__container">
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+      <div class="pswp__item"></div>
+    </div>
+    
+    <div class="pswp__ui pswp__ui--hidden">
+      <div class="pswp__top-bar">
+        <div class="pswp__counter"></div>
+        <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+        <button class="pswp__button pswp__button--share" title="Share"></button>
+        <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+        <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+        
+        <div class="pswp__preloader">
+          <div class="pswp__preloader__icn">
+            <div class="pswp__preloader__cut">
+              <div class="pswp__preloader__donut"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+        <div class="pswp__share-tooltip"></div>
+      </div>
+      
+      <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+      <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
+      
+      <div class="pswp__caption">
+        <div class="pswp__caption__center"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
